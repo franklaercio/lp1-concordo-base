@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <vector>
 #include <string>
 
 using namespace std;
@@ -11,13 +12,16 @@ class Server {
         string name;
         string description;
         string inviteCode;
+        vector<int> participantIds;
 
     public:
         Server();
 
         ~Server();
 
-        Server(int ownerUserId, string name, string description, string inviteCode);   
+        Server(int ownerUserId, string name);
+
+        void addParticipantIDs(int participantId);   
 
         int getOwnerUserId();
         void setOwnerUserId(int id);
@@ -30,6 +34,9 @@ class Server {
 
         string getInviteCode();
         void setInviteCode(string inviteCode);
+
+        vector<int> getParticipantIds();
+        void setParticipantIds(vector<int> participantIds);
 };
 
 #endif

@@ -4,11 +4,13 @@ Server::Server(){}
 
 Server::~Server(){}
 
-Server::Server(int ownerUserId, string name, string description, string inviteCode) {
+Server::Server(int ownerUserId, string name) {
     this->ownerUserId = ownerUserId;
     this->name = name;
-    this->description = description;
-    this->inviteCode = inviteCode;
+}
+
+void Server::addParticipantIDs(int participantId) {
+    this->participantIds.push_back(participantId);
 }
 
 int Server::getOwnerUserId(){
@@ -41,4 +43,12 @@ string Server::getInviteCode() {
 
 void Server::setInviteCode(string inviteCode) {
     this->inviteCode = inviteCode;
+}
+
+vector<int> Server::getParticipantIds() {
+    return this->participantIds;
+}
+
+void Server::setParticipantIds(vector<int> participantIds) {
+    this->participantIds = participantIds;
 }

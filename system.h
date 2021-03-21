@@ -5,12 +5,14 @@
 #include <iostream>
 
 #include "user.h"
+#include "server.h"
 
 using namespace std;
 
 class System {
   private:
-    vector <User> users;
+    vector<Server> servers;
+    vector<User> users;
     int loggedUserId = 0, countUsers = 0;
     string serverNameLogged;
     string channelNameLogged;
