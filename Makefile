@@ -1,18 +1,18 @@
 .DEFAULT_GOAL := all
 
-sistema.o: sistema.cpp sistema.h
-	g++ sistema.cpp -c
+system.o: system.cpp system.h
+	g++ system.cpp -c
 
-executor.o: executor.cpp executor.h sistema.o
+executor.o: executor.cpp executor.h system.o
 	g++ executor.cpp -c
 
 user.o: user.cpp user.h
 	g++ user.cpp -c
 
-objects: sistema.o executor.o user.o
+objects: system.o executor.o user.o
 
-concordo: objects concordo.cpp
-	g++ -Wall -fsanitize=address sistema.o executor.o user.o concordo.cpp -o concordo
+concordo: objects agree.cpp
+	g++ -Wall -fsanitize=address system.o executor.o user.o agree.cpp -o concordo
 
 clean:
 	rm *.o concordo
