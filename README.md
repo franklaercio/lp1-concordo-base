@@ -1,23 +1,30 @@
-# Base para a atividade 03 de LP1
+<h2 align="center"> 
+  Concordo - C++
+</h1>
 
-Use esse esqueleto de classes para iniciar a terceira atividade.
+### Resume
 
-Existe um executor que faz a interpretação dos comandos e executa o método correto do sistema.
+This application was a challenge proposed by the Linguagem de Programação I. This is an application developed in c ++ for clone Discord actions. It is possible to create a user, server, update server description, update server code, remove server, enter a server, disconnect etc.
 
-## Para compilar
+### How to compile
 
 ```console
-make
+make all
 ```
 
-## Para executar
-Você pode rodar o sistema e em logo depois digitar os comandos seguidos de ENTER
+### For starting
+For execute the code you need to run the following code:
+
 ```console
 ./concordo
 ```
 
-Ou pode criar um arquivo de texto com uma lista de comandos (um por linha) e executar o sistema redirecionando esse arquivo como entrada padrão:
+or execute a list of commands:
 ```console
 ./concordo < script_comandos.txt
 ```
 
+### Acknowledgments
+
+- C++
+- POO
