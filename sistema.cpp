@@ -11,16 +11,55 @@ string Sistema::quit() {
 }
 
 string Sistema::create_user (const string email, const string senha, const string nome) {
-  return "create_user NÃO IMPLEMENTADO";
+  if(nome == "" && email == "" && senha == ""){
+    return "Something went wrong, check the reported values!";
+  }  
+
+  for(auto &user : users){
+    if(user.getEmail() == email) {
+      return nome + " already exists with " + email + "!";
+    }  
+  }
+
+  countUsers += 1;
+
+  User user(countUsers, nome, email, senha);
+
+  users.push_back(user);
+
+  return nome + " landed on the Moon!";
 }
 
 string Sistema::login(const string email, const string senha) {
+  if(email == "" && senha == "") {
+    return "Something went wrong, check the reported values!";
+  }
 
-  return "login NÃO IMPLEMENTADO";
+  for(auto &user : users) {
+    if(user.getEmail() == email && user.getPassword() == senha) {
+      usuarioLogadoId = user.getId();
+
+      return "Welcome " + user.getName() + "!";
+    }
+  }
+
+  return "Check your email and password!";
 }
 
 string Sistema::disconnect() {
-  return "disconnect NÃO IMPLEMENTADO";
+  if(usuarioLogadoId == 0) {
+    return "Are you sure there is someone here?";
+  }
+
+  for(auto &user : users) {
+    if(user.getId() == usuarioLogadoId) {
+      usuarioLogadoId = user.getId();
+
+      return "Disconnecting " + user.getName() + "..." + "You say good bye. I say hello!";
+    }
+  }
+
+  return "Something went wrong!";
 }
 
 string Sistema::create_server(const string nome) {

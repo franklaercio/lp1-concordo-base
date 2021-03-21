@@ -6,13 +6,13 @@ sistema.o: sistema.cpp sistema.h
 executor.o: executor.cpp executor.h sistema.o
 	g++ executor.cpp -c
 
-usuario.o: usuario.cpp usuario.h
-	g++ usuario.cpp -c
+user.o: user.cpp user.h
+	g++ user.cpp -c
 
-objects: sistema.o executor.o
+objects: sistema.o executor.o user.o
 
 concordo: objects concordo.cpp
-	g++ -Wall -fsanitize=address sistema.o executor.o concordo.cpp -o concordo
+	g++ -Wall -fsanitize=address sistema.o executor.o user.o concordo.cpp -o concordo
 
 clean:
 	rm *.o concordo
