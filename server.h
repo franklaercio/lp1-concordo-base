@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include "channel.h"
+
 using namespace std;
 
 class Server {
@@ -13,6 +15,7 @@ class Server {
         string description;
         string inviteCode;
         vector<int> participantIds;
+        vector<Channel> channels;
 
     public:
         Server();
@@ -37,6 +40,9 @@ class Server {
 
         vector<int> getParticipantIds();
         void setParticipantIds(vector<int> participantIds);
+
+        vector<Channel> getChannels();
+        void setChannels(vector<Channel> channels);
 };
 
 #endif
