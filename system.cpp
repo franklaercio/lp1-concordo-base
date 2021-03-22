@@ -281,7 +281,7 @@ string System::list_channels() {
 
       listChannels += "#text channels\n";
 
-      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+      for(it = server.channels.begin(); it != server.channels.end(); it++) {
         Channel* channel = *it;
         
         if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
@@ -291,7 +291,7 @@ string System::list_channels() {
 
       listChannels += "#voice channels\n";
 
-      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+      for(it = server.channels.begin(); it != server.channels.end(); it++) {
         Channel* channel = *it;
         
         if(dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
@@ -315,12 +315,22 @@ string System::create_channel(const string name, const string type) {
 
   for(auto &server : servers) {
     if(server.getName() == serverNameLogged) {
+      vector<Channel *>::iterator it;
+
+      for(it = server.channels.begin(); it != server.channels.end(); it++) {
+        Channel* channel = *it;
+
+        if(channel-> getName() == name) {
+          return "Channel " + name + "exists!";
+        }
+      }
+
       if(type == "texto") {
-        TextChannel textChannel(name);
-        server.addChannel((Channel*)(&textChannel));
+        TextChannel newChannel(name);
+        server.channels.push_back(&newChannel);
       }else if(type == "voz") {
-        VoiceChannel voiceChannel(name);
-        server.addChannel((Channel*)(&voiceChannel));
+        VoiceChannel newChannel(name);
+        server.channels.push_back(&newChannel);
       }
     }
   }
@@ -367,7 +377,7 @@ string System::send_message(const string message) {
     if(server.getName() == serverNameLogged) {
       vector<Channel *>::iterator it;
 
-      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+      for(it = server.channels.begin(); it != server.channels.end(); it++) {
         Channel* channel = *it;
         
         if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
@@ -393,7 +403,9 @@ string System::list_messages() {
     if(server.getName() == serverNameLogged) {
       vector<Channel *>::iterator it;
 
-      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+      string output = "";
+
+      for(it = server.channels.begin(); it != server.channels.end(); it++) {
         Channel* channel = *it;
         
         if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
@@ -408,12 +420,12 @@ string System::list_messages() {
                 }
               }
 
-              return userName + "<" + message.getDate() + ">:" + message.getContent();
+              output += userName + "<" + message.getDate() + ">:" + message.getContent();
             }
-          }else {
-            return "There is no message!";
           }
-        }else if (dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
+        }
+        
+        if (dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
           Message message = dynamic_cast<VoiceChannel *>( channel )->getLastMessage();
           
           if(!message.getContent().empty()) {
@@ -426,11 +438,15 @@ string System::list_messages() {
               }
             }
 
-            return userName + "<" + message.getDate() + ">:" + message.getContent();
-          }else {
-            return "There is no message!";
+            output += userName + "<" + message.getDate() + ">:" + message.getContent();
           }
         }
+      }
+
+      if(output.empty()) {
+        return "There is no message!";
+      }else{
+        return output;
       }
     }
   }
