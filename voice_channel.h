@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class VoiceChannel: private Channel {
+class VoiceChannel: public Channel {
     private:
         Message lastMessage;
 
@@ -18,7 +18,7 @@ class VoiceChannel: private Channel {
 
         ~VoiceChannel();
 
-        VoiceChannel(Message message);
+        VoiceChannel(string name): Channel(name) {}
 
         Message getLastMessage();
         void setLastMessage(Message message);

@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class TextChannel: private Channel {
+class TextChannel: public Channel {
     private:
         vector<Message> messages;
 
@@ -18,7 +18,7 @@ class TextChannel: private Channel {
 
         ~TextChannel();
 
-        TextChannel(vector<Message> messages);
+        TextChannel(string name): Channel(name){}
 
         void addMessage(Message message);
 

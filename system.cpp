@@ -3,6 +3,9 @@
 #include <sstream>
 #include <algorithm>
 
+#include "text_channel.h"
+#include "voice_channel.h"
+
 using namespace std;
 
 string System::quit() {
@@ -266,25 +269,171 @@ string System::list_participants() {
 }
 
 string System::list_channels() {
-  return "list_channels NÃO IMPLEMENTADO";
+  if(servers.empty() || serverNameLogged.empty() || loggedUserId == 0) {
+    return "There is no registered server!";
+  }
+
+  string listChannels = "";
+
+  for(auto &server : servers) {
+    if(server.getName() == serverNameLogged) {
+      vector<Channel *>::iterator it;
+
+      listChannels += "#text channels\n";
+
+      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+        Channel* channel = *it;
+        
+        if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
+          listChannels += channel->getName() + "\n";
+        }
+      }
+
+      listChannels += "#voice channels\n";
+
+      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+        Channel* channel = *it;
+        
+        if(dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
+          listChannels += channel->getName() + "\n";
+        }
+      }
+    }
+  }
+
+  return "listChannels";
 }
 
-string System::create_channel(const string nome, const string tipo) {
-  return "create_channel NÃO IMPLEMENTADO";
+string System::create_channel(const string name, const string type) {
+  if(servers.empty() || serverNameLogged.empty() || loggedUserId == 0) {
+    return "There is no registered server!";
+  }
+
+  if(name == "" || type == "") {
+    return "Something went wrong, check the reported values!";
+  }
+
+  for(auto &server : servers) {
+    if(server.getName() == serverNameLogged) {
+      if(type == "texto") {
+        TextChannel textChannel(name);
+        server.addChannel((Channel*)(&textChannel));
+      }else if(type == "voz") {
+        VoiceChannel voiceChannel(name);
+        server.addChannel((Channel*)(&voiceChannel));
+      }
+    }
+  }
+
+  return "Channel " + name + " successfully created!";
 }
 
-string System::enter_channel(const string nome) {
-  return "enter_channel NÃO IMPLEMENTADO";
+string System::enter_channel(const string name) {
+  if(servers.empty() || serverNameLogged.empty() || loggedUserId == 0) {
+    return "There is no registered server!";
+  }
+
+  if(name == "") {
+    return "Something went wrong, check the reported values!";
+  }
+
+  channelNameLogged = name;
+
+  return "Joined the channel " + name + "!";
 }
 
 string System::leave_channel() {
-  return "leave_channel NÃO IMPLEMENTADO";
+  if(servers.empty() || serverNameLogged.empty() || channelNameLogged.empty() || loggedUserId == 0) {
+    return "There is no registered channel or server!";
+  }
+
+  string channelLeave = channelNameLogged;
+
+  channelNameLogged = "";
+
+  return "Leave the channel " + channelLeave + "!";
 }
 
-string System::send_message(const string mensagem) {
-  return "send_message NÃO IMPLEMENTADO";
+string System::send_message(const string message) {
+  if(servers.empty() || serverNameLogged.empty() || channelNameLogged.empty() || loggedUserId == 0) {
+    return "There is no registered channel or server!";
+  }
+
+  if(message == "") {
+    return "Something went wrong, check the reported values!";
+  }
+
+  for(auto &server : servers) {
+    if(server.getName() == serverNameLogged) {
+      vector<Channel *>::iterator it;
+
+      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+        Channel* channel = *it;
+        
+        if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
+          Message sendMessage(loggedUserId, "21/03/2021", message);
+          dynamic_cast<TextChannel *>( channel )->addMessage(sendMessage);
+        }else if (dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
+          Message sendMessage(loggedUserId, "21/03/2021", message);
+          dynamic_cast<VoiceChannel *>( channel )->setLastMessage(sendMessage);
+        }
+      }
+    }
+  }
+
+  return message + " sended successfully!";
 }
 
 string System::list_messages() {
-  return "list_messages NÃO IMPLEMENTADO";
+  if(servers.empty() || serverNameLogged.empty() || channelNameLogged.empty() || loggedUserId == 0) {
+    return "There is no registered channel or server!";
+  }
+
+  for(auto &server : servers) {
+    if(server.getName() == serverNameLogged) {
+      vector<Channel *>::iterator it;
+
+      for(it = server.getChannels().begin(); it != server.getChannels().end(); it++) {
+        Channel* channel = *it;
+        
+        if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
+          if(dynamic_cast<TextChannel *>( channel )->getMessages().size() > 0) {
+            for(auto &message : dynamic_cast<TextChannel *>( channel )->getMessages()) {
+              string userName = "";
+
+              for(auto &user : users) {
+                if(message.getUserId() == user.getId()) {
+                  userName = user.getName();
+                  break;
+                }
+              }
+
+              return userName + "<" + message.getDate() + ">:" + message.getContent();
+            }
+          }else {
+            return "There is no message!";
+          }
+        }else if (dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
+          Message message = dynamic_cast<VoiceChannel *>( channel )->getLastMessage();
+          
+          if(!message.getContent().empty()) {
+            string userName = "";
+
+            for(auto &user : users) {
+              if(message.getUserId() == user.getId()) {
+                userName = user.getName();
+                break;
+              }
+            }
+
+            return userName + "<" + message.getDate() + ">:" + message.getContent();
+          }else {
+            return "There is no message!";
+          }
+        }
+      }
+    }
+  }
+
+  return "Something went wrong!";
 }

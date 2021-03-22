@@ -15,7 +15,7 @@ class Server {
         string description;
         string inviteCode;
         vector<int> participantIds;
-        vector<Channel> channels;
+        vector<Channel *> channels;
 
     public:
         Server();
@@ -24,7 +24,9 @@ class Server {
 
         Server(int ownerUserId, string name);
 
-        void addParticipantIDs(int participantId);   
+        void addParticipantIDs(int participantId);
+
+        void addChannel(Channel* channel);   
 
         int getOwnerUserId();
         void setOwnerUserId(int id);
@@ -41,8 +43,8 @@ class Server {
         vector<int> getParticipantIds();
         void setParticipantIds(vector<int> participantIds);
 
-        vector<Channel> getChannels();
-        void setChannels(vector<Channel> channels);
+        vector<Channel *> getChannels();
+        void setChannels(vector<Channel *> channels);
 };
 
 #endif

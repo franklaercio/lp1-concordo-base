@@ -1,12 +1,6 @@
 #include "text_channel.h"
 
-TextChannel::TextChannel() {}
-
-TextChannel::~TextChannel(){}
-
-TextChannel::TextChannel(vector<Message> messages) {
-    this->messages = messages;
-}
+TextChannel::~TextChannel() {}
 
 void TextChannel::addMessage(Message message) {
     this->messages.push_back(message);

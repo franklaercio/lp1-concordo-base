@@ -6,18 +6,14 @@
 using namespace std;
 
 class Channel {
-    private:
-        string name;
-
     public:
-        Channel();
+        string name;
+    
+        Channel(string name) {
+            this->name = name;
+        }
 
-        ~Channel();
-
-        Channel(string name);
-
-        string getName();
-        void setName(string name);
+        virtual string getName();
 };
 
 #endif

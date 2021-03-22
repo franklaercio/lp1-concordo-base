@@ -13,6 +13,10 @@ void Server::addParticipantIDs(int participantId) {
     this->participantIds.push_back(participantId);
 }
 
+void Server::addChannel(Channel* channel) {
+    this->channels.push_back(channel);
+}
+
 int Server::getOwnerUserId(){
     return this->ownerUserId;
 }
@@ -51,4 +55,12 @@ vector<int> Server::getParticipantIds() {
 
 void Server::setParticipantIds(vector<int> participantIds) {
     this->participantIds = participantIds;
+}
+
+vector<Channel *> Server::getChannels() {
+    return this->channels;
+}
+
+void Server::setChannels(vector<Channel *> channels) {
+    this->channels = channels;
 }
