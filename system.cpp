@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <memory>
 
 #include "text_channel.h"
 #include "voice_channel.h"
@@ -277,14 +278,14 @@ string System::list_channels() {
 
   for(auto &server : servers) {
     if(server.getName() == serverNameLogged) {
-      vector<Channel *>::iterator it;
+      vector<shared_ptr<Channel>>::iterator it;
 
       listChannels += "#text channels\n";
 
       for(it = server.channels.begin(); it != server.channels.end(); it++) {
-        Channel* channel = *it;
+        shared_ptr<Channel> channel = *it;
         
-        if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
+        if(dynamic_pointer_cast<TextChannel>( channel ) != nullptr) {
           listChannels += channel->getName() + "\n";
         }
       }
@@ -292,9 +293,9 @@ string System::list_channels() {
       listChannels += "#voice channels\n";
 
       for(it = server.channels.begin(); it != server.channels.end(); it++) {
-        Channel* channel = *it;
+        shared_ptr<Channel> channel = *it;
         
-        if(dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
+        if(dynamic_pointer_cast<VoiceChannel>( channel ) != nullptr) {
           listChannels += channel->getName() + "\n";
         }
       }
@@ -315,22 +316,22 @@ string System::create_channel(const string name, const string type) {
 
   for(auto &server : servers) {
     if(server.getName() == serverNameLogged) {
-      vector<Channel *>::iterator it;
+      vector<shared_ptr<Channel>>::iterator it;
 
       for(it = server.channels.begin(); it != server.channels.end(); it++) {
-        Channel* channel = *it;
+        shared_ptr<Channel> channel = *it;
 
         if(channel-> getName() == name) {
-          return "Channel " + name + "exists!";
+          return "Channel " + name + " exists!";
         }
       }
 
       if(type == "texto") {
-        TextChannel newChannel(name);
-        server.channels.push_back(&newChannel);
+        shared_ptr<TextChannel> newChannel = make_shared<TextChannel>(name);
+        server.channels.push_back(newChannel);
       }else if(type == "voz") {
-        VoiceChannel newChannel(name);
-        server.channels.push_back(&newChannel);
+        shared_ptr<VoiceChannel> newChannel = make_shared<VoiceChannel>(name);
+        server.channels.push_back(newChannel);
       }
     }
   }
@@ -375,23 +376,29 @@ string System::send_message(const string message) {
 
   for(auto &server : servers) {
     if(server.getName() == serverNameLogged) {
-      vector<Channel *>::iterator it;
+      vector<shared_ptr<Channel>>::iterator it;
 
       for(it = server.channels.begin(); it != server.channels.end(); it++) {
-        Channel* channel = *it;
-        
-        if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
-          Message sendMessage(loggedUserId, "21/03/2021", message);
-          dynamic_cast<TextChannel *>( channel )->addMessage(sendMessage);
-        }else if (dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
-          Message sendMessage(loggedUserId, "21/03/2021", message);
-          dynamic_cast<VoiceChannel *>( channel )->setLastMessage(sendMessage);
+        shared_ptr<Channel> channel = *it;
+
+        if(channel-> getName() == channelNameLogged) {
+          if(dynamic_pointer_cast<TextChannel>(channel) != nullptr) {
+            Message sendMessage(loggedUserId, "21/03/2021", message);
+            dynamic_pointer_cast<TextChannel>(channel)->addMessage(sendMessage);
+
+            return "Text " + message + " sended successfully!";
+          }else if (dynamic_pointer_cast<VoiceChannel>(channel) != nullptr) {
+            Message sendMessage(loggedUserId, "21/03/2021", message);
+            dynamic_pointer_cast<VoiceChannel>(channel)->setLastMessage(sendMessage);
+
+            return "Voice message " + message + " sended successfully!";
+          }
         }
       }
     }
   }
 
-  return message + " sended successfully!";
+  return "Something went wrong!";
 }
 
 string System::list_messages() {
@@ -401,16 +408,16 @@ string System::list_messages() {
 
   for(auto &server : servers) {
     if(server.getName() == serverNameLogged) {
-      vector<Channel *>::iterator it;
+      vector<shared_ptr<Channel>>::iterator it;
 
       string output = "";
 
       for(it = server.channels.begin(); it != server.channels.end(); it++) {
-        Channel* channel = *it;
+        shared_ptr<Channel> channel = *it;
         
-        if(dynamic_cast<TextChannel *>( channel ) != nullptr) {
-          if(dynamic_cast<TextChannel *>( channel )->getMessages().size() > 0) {
-            for(auto &message : dynamic_cast<TextChannel *>( channel )->getMessages()) {
+        if(dynamic_pointer_cast<TextChannel>(channel) != nullptr) {
+          if(dynamic_pointer_cast<TextChannel>(channel)->getMessages().size() > 0) {
+            for(auto &message : dynamic_pointer_cast<TextChannel>(channel)->getMessages()) {
               string userName = "";
 
               for(auto &user : users) {
@@ -420,13 +427,13 @@ string System::list_messages() {
                 }
               }
 
-              output += userName + "<" + message.getDate() + ">:" + message.getContent();
+              output += userName + "<" + message.getDate() + ">:" + message.getContent() + "\n";
             }
           }
         }
         
-        if (dynamic_cast<VoiceChannel *>( channel ) != nullptr) {
-          Message message = dynamic_cast<VoiceChannel *>( channel )->getLastMessage();
+        if (dynamic_pointer_cast<VoiceChannel>(channel) != nullptr) {
+          Message message = dynamic_pointer_cast<VoiceChannel>(channel)->getLastMessage();
           
           if(!message.getContent().empty()) {
             string userName = "";
@@ -438,7 +445,7 @@ string System::list_messages() {
               }
             }
 
-            output += userName + "<" + message.getDate() + ">:" + message.getContent();
+            output += userName + "<" + message.getDate() + ">:" + message.getContent() + "\n";
           }
         }
       }

@@ -3,8 +3,11 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "channel.h"
+#include "text_channel.h"
+#include "voice_channel.h"
 
 using namespace std;
 
@@ -17,7 +20,7 @@ class Server {
         vector<int> participantIds;
 
     public:
-        vector<Channel *> channels;
+        vector<shared_ptr<Channel>> channels;
         
         Server();
 
