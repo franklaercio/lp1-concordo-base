@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <memory>
 #include <fstream>
+#include <stdio.h>
 
 #include "text_channel.h"
 #include "voice_channel.h"
@@ -31,6 +32,8 @@ string System::create_user (const string email, const string senha, const string
   User user(countUsers, nome, email, senha);
 
   users.push_back(user);
+
+  save();
 
   return nome + " landed on the Moon!";
 }
@@ -86,6 +89,8 @@ string System::create_server(const string name) {
 
   servers.push_back(server);
 
+  save();
+
   return "Server " + name + " successfully created!";
 }
 
@@ -124,6 +129,8 @@ string System::set_server_desc(const string name, const string description) {
     }  
   }
 
+  save();
+
   return name + " description updated successfully!";
 }
 
@@ -161,6 +168,8 @@ string System::set_server_invite_code(const string name, const string code) {
       break;
     }  
   }
+
+  save();
 
   return name + " code updated successfully!";
 }
@@ -338,6 +347,8 @@ string System::create_channel(const string name, const string type) {
     }
   }
 
+  save();
+
   return "Channel " + name + " successfully created!";
 }
 
@@ -388,10 +399,14 @@ string System::send_message(const string message) {
             Message sendMessage(loggedUserId, "21/03/2021", message);
             dynamic_pointer_cast<TextChannel>(channel)->addMessage(sendMessage);
 
+            save();
+
             return "Text " + message + " sended successfully!";
           }else if (dynamic_pointer_cast<VoiceChannel>(channel) != nullptr) {
             Message sendMessage(loggedUserId, "21/03/2021", message);
             dynamic_pointer_cast<VoiceChannel>(channel)->setLastMessage(sendMessage);
+
+            save();
 
             return "Voice message " + message + " sended successfully!";
           }
@@ -536,6 +551,9 @@ void System::saveServers() {
 }
 
 void System::save() {
+  remove("usuarios.txt");
+  remove("servidores.txt");
+
   saveUsers();
   saveServers();
 }

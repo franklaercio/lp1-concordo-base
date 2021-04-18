@@ -18,6 +18,8 @@ class System {
     string channelNameLogged;
     void saveUsers();
     void saveServers();
+    void loadUsers();
+    void loadServers();
 
   public:
     string quit();
@@ -39,6 +41,7 @@ class System {
     string send_message(const string mensagem);
     string list_messages();
     void save();
+    void load();
 };
 
 #endif
