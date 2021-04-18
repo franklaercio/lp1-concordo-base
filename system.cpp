@@ -3,6 +3,7 @@
 #include <sstream>
 #include <algorithm>
 #include <memory>
+#include <fstream>
 
 #include "text_channel.h"
 #include "voice_channel.h"
@@ -10,6 +11,7 @@
 using namespace std;
 
 string System::quit() {
+  save();
   return "See you son...";
 }
 
@@ -459,4 +461,81 @@ string System::list_messages() {
   }
 
   return "Something went wrong!";
+}
+
+void System::saveUsers() {
+  fstream usersTxt;
+  
+  usersTxt.open("usuarios.txt", ios::out | ios::app);
+
+  usersTxt << users.size() << "\n";
+
+  for (auto user: users) {
+    usersTxt << user.getId() << "\n";
+    usersTxt << user.getName() << "\n";
+    usersTxt << user.getEmail() << "\n";
+    usersTxt << user.getPassword() << "\n";
+  }
+  
+  usersTxt.close();
+}
+
+void System::saveServers() {
+  fstream serversTxt;
+  
+  serversTxt.open("servidores.txt", ios::out | ios::app);
+
+  serversTxt << servers.size() << "\n";
+
+  for (auto server: servers) {
+    serversTxt << server.getOwnerUserId() << "\n";
+    serversTxt << server.getName() << "\n";
+    serversTxt << server.getDescription() << "\n";
+    serversTxt << server.getInviteCode() << "\n";
+
+    serversTxt << server.getParticipantIds().size() << "\n";
+
+    for (auto participantId: server.getParticipantIds()){
+      serversTxt << participantId << "\n";
+    }
+
+    vector<shared_ptr<Channel>>::iterator it;
+
+    serversTxt << server.channels.size() << "\n";
+
+    for(it = server.channels.begin(); it != server.channels.end(); it++) {
+      shared_ptr<Channel> channel = *it;
+
+      if(dynamic_pointer_cast<TextChannel>(channel) != nullptr) {
+        if(dynamic_pointer_cast<TextChannel>(channel)->getMessages().size() > 0) {
+          serversTxt << dynamic_pointer_cast<TextChannel>(channel)->getName() << "\n";
+          serversTxt << "TEXTO" << "\n";
+          serversTxt << dynamic_pointer_cast<TextChannel>(channel)->getMessages().size() << "\n";
+          
+          for(auto &message : dynamic_pointer_cast<TextChannel>(channel)->getMessages()) {
+            serversTxt << message.getUserId() << "\n";
+            serversTxt << message.getDate() << "\n";
+            serversTxt << message.getContent() << "\n";
+          }
+        }
+      }
+      
+      if (dynamic_pointer_cast<VoiceChannel>(channel) != nullptr) {
+        Message message = dynamic_pointer_cast<VoiceChannel>(channel)->getLastMessage();
+        serversTxt << dynamic_pointer_cast<VoiceChannel>(channel)->getName() << "\n";
+        serversTxt << "VOZ" << "\n";
+        serversTxt << 1 << "\n";
+        serversTxt << message.getUserId() << "\n";
+        serversTxt << message.getDate() << "\n";
+        serversTxt << message.getContent() << "\n";
+      }
+    }
+  }
+  
+  serversTxt.close();
+}
+
+void System::save() {
+  saveUsers();
+  saveServers();
 }

@@ -16,6 +16,8 @@ class System {
     int loggedUserId = 0, countUsers = 0;
     string serverNameLogged;
     string channelNameLogged;
+    void saveUsers();
+    void saveServers();
 
   public:
     string quit();
@@ -36,6 +38,7 @@ class System {
     string leave_channel();
     string send_message(const string mensagem);
     string list_messages();
+    void save();
 };
 
 #endif
