@@ -30,6 +30,59 @@ $ ./concordo
 $ ./concordo < script_comandos.txt
 ```
 
+### :keyboard: Commands
+
+```bash
+# Create user
+$ create-user email password name
+
+# Login in app
+$ login email password
+
+# Disconnect of application
+$ disconnect
+
+# Create new server
+$ create-server name
+
+# Set server description
+$ set-server-desc name description
+
+# Set server invite code
+$ set-server-invite-code name code
+
+# List all servers
+$ list-servers
+
+# Remove servers
+$ remove-server name
+
+# Enter on server
+$ enter-server name code
+
+# Leave server
+$ leave-server
+
+# List all participants of server
+$ list-participants
+
+# List all channels
+$ list-channels
+
+# Create new channel
+$ create-channel name type
+
+# Enter on channel
+$ enter-channel name
+
+# Send new message
+$ send-message message
+
+# List all messages of channel
+$ list-messages
+
+```
+
 ### :artificial_satellite: Acknowledgments
 
 - C++
