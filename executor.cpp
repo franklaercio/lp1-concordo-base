@@ -40,6 +40,9 @@ Executor::Executor(System &system) {
 void Executor::start(istream &inputStream, ostream &outputStream) {
   string line, output;
   this->exit = false;
+
+  this->system->load();
+
   while (! this->exit)
   {
     if (std::getline(inputStream, line)) {

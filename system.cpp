@@ -28,7 +28,7 @@ string System::create_user (const string email, const string senha, const string
     }  
   }
 
-  countUsers += 1;
+  countUsers = users.size() + 1;
 
   User user(countUsers, nome, email, senha);
 
@@ -562,30 +562,34 @@ void System::save() {
 void System::loadUsers() {
   ifstream usersTxt;
   
-  usersTxt.open("usuarios.txt", ios::out | ios::app);
+  usersTxt.open("usuarios.txt");
 
   if (usersTxt.is_open()) {
     string line;
 
     getline(usersTxt, line);
 
-    int size;
+    int size, userId;
 
-    stringstream ss;  
-    ss << line;  
-    ss >> size;
+    stringstream sizeStringStream;  
+    sizeStringStream << line;  
+    sizeStringStream >> size;
 
     if(size > 0) {
       while (!usersTxt.eof()) {
         getline(usersTxt, line);
-        string id = line;
+        stringstream idStringStream; 
+        idStringStream << line;  
+        idStringStream >> userId;
         getline(usersTxt, line);
         string name = line;
         getline(usersTxt, line);
         string email = line;
         getline(usersTxt, line);
         string password = line;
-        create_user(email, password, name);
+
+        User user(userId, name, email, password);
+        users.push_back(user);
       }
     }
 
@@ -596,25 +600,26 @@ void System::loadUsers() {
 void System::loadServers() {
   ifstream serversTxt;
   
-  serversTxt.open("servidores.txt", ios::out | ios::app);
+  serversTxt.open("servidores.txt");
 
   if (serversTxt.is_open()) {
     string line;
 
     getline(serversTxt, line);
 
-    int size, userOwnerId, totalParticipants, participantId, totalChannels;
+    int size, userOwnerId, totalParticipants, participantId, totalChannels, totalMessages, userId;
 
-    stringstream ss;  
-    ss << line;  
-    ss >> size;
+    stringstream sizeStringStream;  
+    sizeStringStream << line;  
+    sizeStringStream >> size;
 
     if(size > 0) {
       while (!serversTxt.eof()) {
         getline(serversTxt, line);
         string id = line;
-        ss << line;  
-        ss >> userOwnerId;
+        stringstream idStringStream;  
+        idStringStream << line;  
+        idStringStream >> userOwnerId;
         getline(serversTxt, line);
         string serverName = line;
         getline(serversTxt, line);
@@ -628,26 +633,72 @@ void System::loadServers() {
         servers.push_back(server);
 
         getline(serversTxt, line);
-        ss << line;  
-        ss >> totalParticipants;
+        stringstream totalParticipantsStringStream; 
+        totalParticipantsStringStream << line;  
+        totalParticipantsStringStream >> totalParticipants;
 
         if (totalParticipants > 0) {
           for (int i = 0; i < totalParticipants; i++) {
             getline(serversTxt, line);
-            ss << line;  
-            ss >> participantId;
+            stringstream participantIdStringStream; 
+            participantIdStringStream << line;  
+            participantIdStringStream >> participantId;
 
             server.addParticipantIDs(participantId);
           }
         }
 
         getline(serversTxt, line);
-        ss << line;  
-        ss >> totalChannels;
+        stringstream totalChannelsStringStream; 
+        totalChannelsStringStream << line;  
+        totalChannelsStringStream >> totalChannels;
 
         if (totalChannels > 0) {
           for (int i = 0; i < totalChannels; i++) {
-            
+            getline(serversTxt, line);
+            string channelName = line;
+            getline(serversTxt, line);
+            string channelType = line;
+
+            if(channelType == "TEXTO") {
+              shared_ptr<TextChannel> newChannel = make_shared<TextChannel>(channelName);
+              server.channels.push_back(newChannel);
+            }else if(channelType == "VOZ") {
+              shared_ptr<VoiceChannel> newChannel = make_shared<VoiceChannel>(channelName);
+              server.channels.push_back(newChannel);
+            }
+
+            getline(serversTxt, line);
+            stringstream totalMessagesStringStream; 
+            totalMessagesStringStream << line;  
+            totalMessagesStringStream >> totalMessages;
+
+            for (int j = 0; j < totalMessages; j++) {
+              getline(serversTxt, line);
+              stringstream userIdStringStream; 
+              userIdStringStream << line;  
+              userIdStringStream >> userId;
+              getline(serversTxt, line);
+              string dateMessage = line;
+              getline(serversTxt, line);
+              string contentMessage = line;
+
+              vector<shared_ptr<Channel>>::iterator it;
+
+              for(it = server.channels.begin(); it != server.channels.end(); it++) {
+                shared_ptr<Channel> channel = *it;
+
+                if(channel-> getName() == channelName) {
+                  if(channelType == "TEXTO") {
+                    Message sendMessage(userId, dateMessage, contentMessage);
+                    dynamic_pointer_cast<TextChannel>(channel)->addMessage(sendMessage);
+                  }else if (channelType == "VOZ") {
+                    Message sendMessage(userId, dateMessage, contentMessage);
+                    dynamic_pointer_cast<VoiceChannel>(channel)->setLastMessage(sendMessage);
+                  }
+                }
+              }  
+            }
           }
         }
       }
@@ -659,4 +710,5 @@ void System::loadServers() {
 
 void System::load() {
   loadUsers();
+  loadServers();
 }
