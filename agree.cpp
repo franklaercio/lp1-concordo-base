@@ -13,6 +13,7 @@ using namespace std;
  */
 int main() {
   System system;
+  system.load();
   Executor executor(system);
   
   executor.start(cin, cout);

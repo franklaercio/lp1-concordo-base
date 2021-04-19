@@ -5,6 +5,7 @@
 #include <memory>
 #include <fstream>
 #include <stdio.h>
+#include <string>
 
 #include "text_channel.h"
 #include "voice_channel.h"
@@ -556,4 +557,106 @@ void System::save() {
 
   saveUsers();
   saveServers();
+}
+
+void System::loadUsers() {
+  ifstream usersTxt;
+  
+  usersTxt.open("usuarios.txt", ios::out | ios::app);
+
+  if (usersTxt.is_open()) {
+    string line;
+
+    getline(usersTxt, line);
+
+    int size;
+
+    stringstream ss;  
+    ss << line;  
+    ss >> size;
+
+    if(size > 0) {
+      while (!usersTxt.eof()) {
+        getline(usersTxt, line);
+        string id = line;
+        getline(usersTxt, line);
+        string name = line;
+        getline(usersTxt, line);
+        string email = line;
+        getline(usersTxt, line);
+        string password = line;
+        create_user(email, password, name);
+      }
+    }
+
+    usersTxt.close();
+  }  
+}
+
+void System::loadServers() {
+  ifstream serversTxt;
+  
+  serversTxt.open("servidores.txt", ios::out | ios::app);
+
+  if (serversTxt.is_open()) {
+    string line;
+
+    getline(serversTxt, line);
+
+    int size, userOwnerId, totalParticipants, participantId, totalChannels;
+
+    stringstream ss;  
+    ss << line;  
+    ss >> size;
+
+    if(size > 0) {
+      while (!serversTxt.eof()) {
+        getline(serversTxt, line);
+        string id = line;
+        ss << line;  
+        ss >> userOwnerId;
+        getline(serversTxt, line);
+        string serverName = line;
+        getline(serversTxt, line);
+        string serverDescription = line;
+        getline(serversTxt, line);
+        string serverInviteCode = line;
+
+        Server server(userOwnerId, serverName);
+        server.setDescription(serverDescription);
+        server.setInviteCode(serverInviteCode);
+        servers.push_back(server);
+
+        getline(serversTxt, line);
+        ss << line;  
+        ss >> totalParticipants;
+
+        if (totalParticipants > 0) {
+          for (int i = 0; i < totalParticipants; i++) {
+            getline(serversTxt, line);
+            ss << line;  
+            ss >> participantId;
+
+            server.addParticipantIDs(participantId);
+          }
+        }
+
+        getline(serversTxt, line);
+        ss << line;  
+        ss >> totalChannels;
+
+        if (totalChannels > 0) {
+          for (int i = 0; i < totalChannels; i++) {
+            
+          }
+        }
+      }
+    }
+
+    serversTxt.close();
+  }  
+}
+
+void System::load() {
+  loadUsers();
 }
