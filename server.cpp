@@ -10,7 +10,17 @@ Server::Server(int ownerUserId, string name) {
 }
 
 void Server::addParticipantIDs(int participantId) {
-    this->participantIds.push_back(participantId);
+    bool existId = false;
+
+    for (auto id: participantIds) {
+      if(id == participantId) {
+        existId = true;
+      }
+    }
+
+    if(!existId) {
+      this->participantIds.push_back(participantId);
+    }
 }
 
 int Server::getOwnerUserId(){

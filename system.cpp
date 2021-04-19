@@ -314,7 +314,7 @@ string System::list_channels() {
     }
   }
 
-  return "listChannels";
+  return listChannels;
 }
 
 string System::create_channel(const string name, const string type) {
@@ -614,12 +614,11 @@ void System::loadServers() {
     sizeStringStream >> size;
 
     if(size > 0) {
-      while (!serversTxt.eof()) {
+      for(int m = 0; m < size; m++) {
         getline(serversTxt, line);
-        string id = line;
-        stringstream idStringStream;  
-        idStringStream << line;  
-        idStringStream >> userOwnerId;
+        stringstream userOwnerIdStringStream;  
+        userOwnerIdStringStream << line;  
+        userOwnerIdStringStream >> userOwnerId;
         getline(serversTxt, line);
         string serverName = line;
         getline(serversTxt, line);
@@ -630,7 +629,6 @@ void System::loadServers() {
         Server server(userOwnerId, serverName);
         server.setDescription(serverDescription);
         server.setInviteCode(serverInviteCode);
-        servers.push_back(server);
 
         getline(serversTxt, line);
         stringstream totalParticipantsStringStream; 
@@ -701,6 +699,8 @@ void System::loadServers() {
             }
           }
         }
+
+        servers.push_back(server);
       }
     }
 
